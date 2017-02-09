@@ -1,7 +1,7 @@
-import THREE from 'three';
+import Colors from '../constants/Colors';
 
 class Sea {
-    constructor(){
+    constructor(game){
         let geom = new THREE.CylinderGeometry(game.seaRadius,game.seaRadius,game.seaLength,40,10);
         geom.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI/2));
         geom.mergeVertices();

@@ -1,7 +1,7 @@
-import THREE from 'three';
+import Cloud from './Cloud';
 
 class Sky {
-    constructor(){
+    constructor(game){
         this.mesh = new THREE.Object3D();
         this.nClouds = 20;
         this.clouds = [];

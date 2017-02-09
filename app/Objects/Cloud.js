@@ -1,4 +1,4 @@
-import THREE from 'three';
+import Colors from '../constants/Colors';
 
 class Cloud {
     constructor(){

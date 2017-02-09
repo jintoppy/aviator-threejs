@@ -1,9 +1,8 @@
+import Game from './Game/Game';
+
 console.log('hello');
 
+const init = () => new Game();
 
 
-
-document.addEventListener('mousemove', handleMouseMove, false);
-document.addEventListener('touchmove', handleTouchMove, false);
-document.addEventListener('mouseup', handleMouseUp, false);
-document.addEventListener('touchend', handleTouchEnd, false);
+window.addEventListener('load', init, false);

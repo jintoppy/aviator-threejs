@@ -1,7 +1,8 @@
-import THREE from 'three';
+import Colors from '../constants/Colors';
 
 class Pilot {
-    constructor(){
+    constructor(game){
+        this.game = game;
         this.mesh = new THREE.Object3D();
         this.mesh.name = "pilot";
         this.angleHairs=0;
@@ -83,7 +84,7 @@ class Pilot {
             let h = hairs[i];
             h.scale.y = .75 + Math.cos(this.angleHairs+i/3)*.25;
         }
-        this.angleHairs += game.speed*deltaTime*40;
+        this.angleHairs += this.game.speed*deltaTime*40;
     }
 }
 

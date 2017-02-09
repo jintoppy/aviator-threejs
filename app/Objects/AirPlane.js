@@ -1,7 +1,8 @@
-import THREE from 'three';
+import Colors from '../constants/Colors';
+import Pilot from './Pilot';
 
 class AirPlane {
-    constructor(){
+    constructor(game){
         this.mesh = new THREE.Object3D();
         this.mesh.name = "airPlane";
 
@@ -137,7 +138,7 @@ class AirPlane {
         suspension.rotation.z = -.3;
         this.mesh.add(suspension);
 
-        this.pilot = new Pilot();
+        this.pilot = new Pilot(game);
         this.pilot.mesh.position.set(-10,27,0);
         this.mesh.add(this.pilot.mesh);
 

@@ -1,7 +1,7 @@
-import THREE from 'three';
+import Coin from './Coin';
 
 class CoinsHolder {
-    constructor(){
+    constructor(nCoins){
         this.mesh = new THREE.Object3D();
         this.coinsInUse = [];
         this.coinsPool = [];
