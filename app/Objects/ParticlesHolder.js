@@ -1,7 +1,8 @@
-
+import Particle from './Particle';
 
 class ParticlesHolder {
-    constructor(){
+    constructor(particlesPool){
+        this.particlesPool = particlesPool;
         this.mesh = new THREE.Object3D();
         this.particlesInUse = [];
     }
@@ -9,10 +10,10 @@ class ParticlesHolder {
         let nPArticles = density;
         for (let i=0; i<nPArticles; i++){
             let particle;
-            if (particlesPool.length) {
-            particle = particlesPool.pop();
+            if (this.particlesPool.length) {
+                particle = this.particlesPool.pop();
             }else{
-            particle = new Particle();
+                particle = new Particle();
             }
             this.mesh.add(particle.mesh);
             particle.mesh.visible = true;

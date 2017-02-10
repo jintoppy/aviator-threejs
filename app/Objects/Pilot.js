@@ -84,7 +84,7 @@ class Pilot {
             let h = hairs[i];
             h.scale.y = .75 + Math.cos(this.angleHairs+i/3)*.25;
         }
-        this.angleHairs += this.game.speed*deltaTime*40;
+        this.angleHairs += this.game.speed*this.game.deltaTime*40;
     }
 }
 

@@ -3,6 +3,7 @@ import Cloud from './Cloud';
 class Sky {
     constructor(game){
         this.mesh = new THREE.Object3D();
+        this.game = game;
         this.nClouds = 20;
         this.clouds = [];
         var stepAngle = Math.PI*2 / this.nClouds;
@@ -25,7 +26,7 @@ class Sky {
             var c = this.clouds[i];
             c.rotate();
         }
-        this.mesh.rotation.z += game.speed*deltaTime;
+        this.mesh.rotation.z += this.game.speed*this.game.deltaTime;
     }
 }
 

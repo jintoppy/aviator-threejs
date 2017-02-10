@@ -14,19 +14,21 @@ class Game {
 
         this.newTime = new Date().getTime();
         this.oldTime = new Date().getTime();
-        this.deltaTime = 0;
+        
 
         this.reset();
+        this.game.deltaTime = 0;
         this.sceneObj = new Scene(this.game);
 
-        this.airplane = builder.createPlane(this.sceneObj.scene, this.game);
-        builder.createSea(this.sceneObj.scene, this.game);
-        builder.createSky(this.sceneObj.scene, this.game);
-        builder.createCoins(this.sceneObj.scene);
-        builder.createEnnemies(this.sceneObj.scene);
-        builder.createParticles(this.sceneObj.scene);
+        this.game.airplane = this.airplane = builder.createPlane(this.sceneObj.scene, this.game);
+        this.game.sea = this.sea = builder.createSea(this.sceneObj.scene, this.game);
+        this.game.sky = this.sky = builder.createSky(this.sceneObj.scene, this.game);
+        this.game.coinsHolder = this.coinsHolder = builder.createCoins(this.sceneObj.scene, this.game);
+        this.game.ennemiesHolder = this.ennemiesHolder = builder.createEnemies(this.sceneObj.scene, this.game);
+        this.game.particlesHolder = this.particlesHolder = builder.createParticles(this.sceneObj.scene);
 
-        new Events();     
+        this.game.addEnergy = this.addEnergy.bind(this);
+        new Events(this);     
 
         this.loop();
     }
@@ -97,7 +99,7 @@ class Game {
 
     loop(){
         this.newTime = new Date().getTime();
-        this.deltaTime = this.newTime-this.oldTime;
+        this.game.deltaTime = this.newTime-this.oldTime;
         this.oldTime = this.newTime;
 
         if (this.game.status=="playing"){
@@ -105,18 +107,18 @@ class Game {
             // Add energy coins every 100m;
             if (Math.floor(this.game.distance)%this.game.distanceForCoinsSpawn == 0 && Math.floor(this.game.distance) > this.game.coinLastSpawn){
                 this.game.coinLastSpawn = Math.floor(this.game.distance);
-                coinsHolder.spawnCoins();
+                this.coinsHolder.spawnCoins();
             }
 
             if (Math.floor(this.game.distance)%this.game.distanceForSpeedUpdate == 0 && Math.floor(this.game.distance) > this.game.speedLastUpdate){
                 this.game.speedLastUpdate = Math.floor(this.game.distance);
-                this.game.targetBaseSpeed += this.game.incrementSpeedByTime*this.deltaTime;
+                this.game.targetBaseSpeed += this.game.incrementSpeedByTime*this.game.deltaTime;
             }
 
 
             if (Math.floor(this.game.distance)%this.game.distanceForEnnemiesSpawn == 0 && Math.floor(this.game.distance) > this.game.ennemyLastSpawn){
                 this.game.ennemyLastSpawn = Math.floor(this.game.distance);
-                ennemiesHolder.spawnEnnemies();
+                this.ennemiesHolder.spawnEnnemies();
             }
 
             if (Math.floor(this.game.distance)%this.game.distanceForLevelUpdate == 0 && Math.floor(this.game.distance) > this.game.levelLastUpdate){
@@ -131,15 +133,15 @@ class Game {
             this.updatePlane();
             this.updateDistance();
             this.updateEnergy();
-            this.game.baseSpeed += (this.game.targetBaseSpeed - this.game.baseSpeed) * this.deltaTime * 0.02;
+            this.game.baseSpeed += (this.game.targetBaseSpeed - this.game.baseSpeed) * this.game.deltaTime * 0.02;
             this.game.speed = this.game.baseSpeed * this.game.planeSpeed;
 
         }else if(this.game.status=="gameover"){
             this.game.speed *= .99;
-            airplane.mesh.rotation.z += (-Math.PI/2 - airplane.mesh.rotation.z)*.0002*this.deltaTime;
-            airplane.mesh.rotation.x += 0.0003*this.deltaTime;
+            airplane.mesh.rotation.z += (-Math.PI/2 - airplane.mesh.rotation.z)*.0002*this.game.deltaTime;
+            airplane.mesh.rotation.x += 0.0003*this.game.deltaTime;
             this.game.planeFallSpeed *= 1.05;
-            airplane.mesh.position.y -= this.game.planeFallSpeed*this.deltaTime;
+            airplane.mesh.position.y -= this.game.planeFallSpeed*this.game.deltaTime;
 
             if (airplane.mesh.position.y <-200){
             this.showReplay();
@@ -151,41 +153,41 @@ class Game {
         }
 
 
-        airplane.propeller.rotation.x +=.2 + this.game.planeSpeed * deltaTime*.005;
-        sea.mesh.rotation.z += this.game.speed*deltaTime;//*game.seaRotationSpeed;
+        this.airplane.propeller.rotation.x +=.2 + this.game.planeSpeed * this.game.deltaTime*.005;
+        this.sea.mesh.rotation.z += this.game.speed*this.game.deltaTime;//*game.seaRotationSpeed;
 
-        if ( sea.mesh.rotation.z > 2*Math.PI)  sea.mesh.rotation.z -= 2*Math.PI;
+        if ( this.sea.mesh.rotation.z > 2*Math.PI)  this.sea.mesh.rotation.z -= 2*Math.PI;
 
-        ambientLight.intensity += (.5 - ambientLight.intensity)*deltaTime*0.005;
+        this.sceneObj.ambientLight.intensity += (.5 - this.sceneObj.ambientLight.intensity)*this.game.deltaTime*0.005;
 
-        coinsHolder.rotateCoins();
-        ennemiesHolder.rotateEnnemies();
+        this.coinsHolder.rotateCoins();
+        this.ennemiesHolder.rotateEnnemies();
 
-        sky.moveClouds();
-        sea.moveWaves();
+        this.sky.moveClouds();
+        this.sea.moveWaves();
 
-        renderer.render(scene, camera);
-        requestAnimationFrame(loop);
+        this.sceneObj.renderer.render(this.sceneObj.scene, this.sceneObj.camera);
+        requestAnimationFrame(this.loop.bind(this));
     }
 
     updateDistance(){
-        this.game.distance += this.game.speed*deltaTime*this.game.ratioSpeedDistance;
-        fieldDistance.innerHTML = Math.floor(this.game.distance);
+        this.game.distance += this.game.speed*this.game.deltaTime*this.game.ratioSpeedDistance;
+        this.fieldDistance.innerHTML = Math.floor(this.game.distance);
         var d = 502*(1-(this.game.distance%this.game.distanceForLevelUpdate)/this.game.distanceForLevelUpdate);
         levelCircle.setAttribute("stroke-dashoffset", d);
 
     }
 
     updateEnergy(){
-        this.game.energy -= this.game.speed*deltaTime*this.game.ratioSpeedEnergy;
+        this.game.energy -= this.game.speed*this.game.deltaTime*this.game.ratioSpeedEnergy;
         this.game.energy = Math.max(0, this.game.energy);
-        energyBar.style.right = (100-this.game.energy)+"%";
-        energyBar.style.backgroundColor = (this.game.energy<50)? "#f25346" : "#68c3c0";
+        this.energyBar.style.right = (100-this.game.energy)+"%";
+        this.energyBar.style.backgroundColor = (this.game.energy<50)? "#f25346" : "#68c3c0";
 
         if (this.game.energy<30){
-            energyBar.style.animationName = "blinking";
+            this.energyBar.style.animationName = "blinking";
         }else{
-            energyBar.style.animationName = "none";
+            this.energyBar.style.animationName = "none";
         }
 
         if (this.game.energy <1){
@@ -220,20 +222,20 @@ class Game {
         this.game.planeCollisionDisplacementY += this.game.planeCollisionSpeedY;
         targetY += this.game.planeCollisionDisplacementY;
 
-        this.airplane.mesh.position.y += (targetY-this.airplane.mesh.position.y)*this.deltaTime*this.game.planeMoveSensivity;
-        this.airplane.mesh.position.x += (targetX-this.airplane.mesh.position.x)*this.deltaTime*this.game.planeMoveSensivity;
+        this.airplane.mesh.position.y += (targetY-this.airplane.mesh.position.y)*this.game.deltaTime*this.game.planeMoveSensivity;
+        this.airplane.mesh.position.x += (targetX-this.airplane.mesh.position.x)*this.game.deltaTime*this.game.planeMoveSensivity;
 
-        this.airplane.mesh.rotation.z = (targetY-this.airplane.mesh.position.y)*this.deltaTime*this.game.planeRotXSensivity;
-        this.airplane.mesh.rotation.x = (this.airplane.mesh.position.y-targetY)*this.deltaTime*this.game.planeRotZSensivity;
+        this.airplane.mesh.rotation.z = (targetY-this.airplane.mesh.position.y)*this.game.deltaTime*this.game.planeRotXSensivity;
+        this.airplane.mesh.rotation.x = (this.airplane.mesh.position.y-targetY)*this.game.deltaTime*this.game.planeRotZSensivity;
         var targetCameraZ = Utils. normalize(this.game.planeSpeed, this.game.planeMinSpeed, this.game.planeMaxSpeed, this.game.cameraNearPos, this.game.cameraFarPos);
         this.sceneObj.camera.fov = Utils. normalize(this.mousePos.x,-1,1,40, 80);
         this.sceneObj.camera.updateProjectionMatrix ()
-        this.sceneObj.camera.position.y += (this.airplane.mesh.position.y - this.sceneObj.camera.position.y)*this.deltaTime*this.game.cameraSensivity;
+        this.sceneObj.camera.position.y += (this.airplane.mesh.position.y - this.sceneObj.camera.position.y)*this.game.deltaTime*this.game.cameraSensivity;
 
-        this.game.planeCollisionSpeedX += (0-this.game.planeCollisionSpeedX)*this.deltaTime * 0.03;
-        this.game.planeCollisionDisplacementX += (0-this.game.planeCollisionDisplacementX)*this.deltaTime *0.01;
-        this.game.planeCollisionSpeedY += (0-this.game.planeCollisionSpeedY)*this.deltaTime * 0.03;
-        this.game.planeCollisionDisplacementY += (0-this.game.planeCollisionDisplacementY)*this.deltaTime *0.01;
+        this.game.planeCollisionSpeedX += (0-this.game.planeCollisionSpeedX)*this.game.deltaTime * 0.03;
+        this.game.planeCollisionDisplacementX += (0-this.game.planeCollisionDisplacementX)*this.game.deltaTime *0.01;
+        this.game.planeCollisionSpeedY += (0-this.game.planeCollisionSpeedY)*this.game.deltaTime * 0.03;
+        this.game.planeCollisionDisplacementY += (0-this.game.planeCollisionDisplacementY)*this.game.deltaTime *0.01;
 
         this.airplane.pilot.updateHairs();
     }

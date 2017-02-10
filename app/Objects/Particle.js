@@ -1,7 +1,8 @@
 
 
 class Particle {
-    constructor(){
+    constructor(particlesPool){
+        this.particlesPool = particlesPool;
         var geom = new THREE.TetrahedronGeometry(3,0);
         var mat = new THREE.MeshPhongMaterial({
             color:0x009999,
@@ -25,7 +26,7 @@ class Particle {
         TweenMax.to(this.mesh.position, speed, {x:targetX, y:targetY, delay:Math.random() *.1, ease:Power2.easeOut, onComplete:function(){
             if(_p) _p.remove(_this.mesh);
             _this.mesh.scale.set(1,1,1);
-            particlesPool.unshift(_this);
+            _this.particlesPool.unshift(_this);
         }});
     }
 }

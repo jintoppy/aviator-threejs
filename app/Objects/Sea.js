@@ -2,6 +2,7 @@ import Colors from '../constants/Colors';
 
 class Sea {
     constructor(game){
+        this.game = game;
         let geom = new THREE.CylinderGeometry(game.seaRadius,game.seaRadius,game.seaLength,40,10);
         geom.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI/2));
         geom.mergeVertices();
@@ -40,7 +41,7 @@ class Sea {
             let vprops = this.waves[i];
             v.x =  vprops.x + Math.cos(vprops.ang)*vprops.amp;
             v.y = vprops.y + Math.sin(vprops.ang)*vprops.amp;
-            vprops.ang += vprops.speed*deltaTime;
+            vprops.ang += vprops.speed*this.game.deltaTime;
             this.mesh.geometry.verticesNeedUpdate=true;
         }
     }
